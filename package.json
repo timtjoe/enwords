@@ -1,0 +1,30 @@
+{
+  "name": "enwords",
+  "version": "0.1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsdown ./src/index.ts",
+    "test": "vitest",
+    "release:patch": "npm version patch -m \"Release %s\" && npm publish --access public",
+    "release:minor": "npm version minor -m \"Release %s\" && npm publish --access public",
+    "release:major": "npm version major -m \"Release %s\" && npm publish --access public"
+  },
+  "keywords": [
+    "word generator",
+    "short words",
+    "english words",
+    "word pattern"
+  ],
+  "author": "Timothy T. Joe <timtjoe@gmail.com>",
+  "license": "MIT",
+  "description": "This library is used to generate sets of 2, 3, or 4 letter English words based on a given pattern.",
+  "devDependencies": {
+    "tsdown": "^0.21.10",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
