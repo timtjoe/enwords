@@ -1,113 +1,37 @@
-export type Length = 2 | 3 | 4;
-export type Pattern =
-  | "CV"
-  | "VC"
-  | "CVC"
-  | "VCV"
-  | "CVV"
-  | "VVC"
-  | "CCV"
-  | "VCC"
-  | "CVCV"
-  | "VCVC"
-  | "CVVC"
-  | "VCCV"
-  | "CCVV"
-  | "VVCC"
-  | "CCVC"
-  | "CVCC";
+import { consonants, DEFAULTS, Size, vowels } from "./tokens";
 
-const consonants = [
-  "b",
-  "c",
-  "d",
-  "f",
-  "g",
-  "h",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-];
-const vowels = ["a", "e", "i", "o", "u"];
+export function createGenerator() {
+  const history: string[] = [];
 
-export interface Result {
-  words: string[];
-  count: number;
-  message: string;
-}
-
-const isLength = (val: number): val is Length =>
-  val === 2 || val === 3 || val === 4;
-
-export class Generator {
-  generate(length: Length, pattern?: Pattern, count?: number): Result {
-    const results: string[] = [];
-
-    const expand = (pat: string, current: string) => {
-      if (pat.length === 0) {
-        results.push(current);
-        return;
-      }
-      const symbol = pat[0];
-      if (symbol === "C") {
-        for (const c of consonants) expand(pat.slice(1), current + c);
-      } else if (symbol === "V") {
-        for (const v of vowels) expand(pat.slice(1), current + v);
-      }
-    };
-
-    const defaults: Record<number, Pattern[]> = {
-      2: ["CV", "VC"],
-      3: ["CVC", "VCV", "CVV", "VVC", "CCV", "VCC"],
-      4: ["CVCV", "VCVC", "CVVC", "VCCV", "CCVV", "VVCC", "CCVC", "CVCC"],
-    };
-
-    const isInputValid = isLength(length);
-    const targetLength: Length = isInputValid ? length : 2;
-    let chosenPattern: Pattern;
-
-    if (pattern && defaults[targetLength].includes(pattern)) {
-      chosenPattern = pattern;
-    } else {
-      chosenPattern = defaults[targetLength][0];
+  return function enword(size: Size): string[] {
+    if (size !== 2 && size !== 3 && size !== 4) {
+      throw new Error("Invalid size. Use 2, 3, or 4.");
     }
 
-    expand(chosenPattern, "");
+    const patterns = DEFAULTS[size];
+    const batch: string[] = [];
 
-    let finalWords = results;
-    let message = "Success";
+    while (batch.length < 20) {
+      const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+      let word = "";
 
-    // Force a strict safe limit of 13 if the structural input parameters were invalid
-    const targetCount = !isInputValid && count && count > 13 ? 13 : count;
+      for (let i = 0; i < pattern.length; i++) {
+        const source = pattern[i] === "C" ? consonants : vowels;
+        word += source[Math.floor(Math.random() * source.length)];
+      }
 
-    if (targetCount && targetCount > 0) {
-      if (targetCount <= results.length) {
-        finalWords = results.slice(0, targetCount);
-        if (!isInputValid && count && count > 13) {
-          message = "Requested count too high, defaulted to 13 results";
-        }
-      } else {
-        finalWords = results.slice(0, 13);
-        message = "Requested count too high, defaulted to 13 results";
+      // Ensure uniqueness within the current batch AND across recent history
+      if (!batch.includes(word) && !history.includes(word)) {
+        batch.push(word);
+        history.push(word);
       }
     }
 
-    return {
-      words: finalWords,
-      count: finalWords.length,
-      message,
-    };
-  }
+    // Retain only the last 40 generated words in memory
+    if (history.length > 40) {
+      history.splice(0, history.length - 40);
+    }
+
+    return batch;
+  };
 }

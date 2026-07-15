@@ -1,6 +1,9 @@
 {
   "name": "enword",
-  "version": "0.1.1",
+  "version": "0.0.2",
+  "description": "This library is used to generate sets of 2, 3, or 4 letter English words based on a given pattern.",
+  "author": "Timothy T. Joe <timtjoe@gmail.com>",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "exports": {
@@ -19,9 +22,6 @@
     "english words",
     "word pattern"
   ],
-  "author": "Timothy T. Joe <timtjoe@gmail.com>",
-  "license": "MIT",
-  "description": "This library is used to generate sets of 2, 3, or 4 letter English words based on a given pattern.",
   "devDependencies": {
     "tsdown": "^0.21.10",
     "typescript": "^7.0.2",
